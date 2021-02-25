@@ -393,12 +393,14 @@ const char*	STDCALL jaspRCPP_evalRCode(const char *rCode) {
 	rinside->instance()[".rCode"] = CSTRING_TO_R(rCode);
 	const std::string rCodeTryCatch(""
 		"returnVal = 'null';	"
-		"tryCatch(withCallingHandlers(	"
-		"	suppressWarnings({	returnVal <- eval(parse(text=.rCode))     }),	"
-		"		error	= function(e) { .setRError(  paste0(toString(e$message), '\n', paste0(sys.calls(), collapse='\n'))) }, 	"
-		//"		warning	= function(w) { .setRWarning(paste0(toString(w$message), '\n', paste0(sys.calls(), collapse='\n'))) }		" //I guess this one doesn't make a lot of sense when we are suppressing warnings...q
-		"), error = function(e) {} );			" //Already printed
-		"returnVal	");
+	//	"tryCatch("
+		"  withCallingHandlers(	"
+		"    suppressWarnings({	returnVal <- eval(parse(text=.rCode))     }),	"
+		"      error	= function(e) { .setRError(  paste0(toString(e$message), '\n', paste0(sys.calls(), collapse='\n'))) } 	"
+		//",		warning	= function(w) { .setRWarning(paste0(toString(w$message), '\n', paste0(sys.calls(), collapse='\n'))) }		" //I guess this one doesn't make a lot of sense when we are suppressing warnings...q
+		")"
+	//	", error = function(e) {} )"			 //Already printed
+		"; returnVal	");
 
 	SEXP result = jaspRCPP_parseEval(rCodeTryCatch);
 
